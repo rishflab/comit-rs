@@ -4,7 +4,18 @@
 pub mod bitcoin;
 pub mod ethereum;
 
-use futures::Future;
+use chrono::NaiveDateTime;
+use futures::{Future, Stream};
+
+pub trait MatchingTransactions<P>: Send + Sync + 'static {
+    type Transaction;
+
+    fn matching_transactions(
+        &self,
+        pattern: P,
+        after: NaiveDateTime,
+    ) -> Box<dyn Stream<Item = Self::Transaction, Error = ()> + Send>;
+}
 
 pub trait LatestBlock: Send + Sync + 'static {
     type Block;
@@ -37,5 +48,16 @@ pub trait ReceiptByHash: Send + Sync + 'static {
 
 /// Checks if a given block predates a certain timestamp.
 pub trait Predates {
-    fn predates(&self, timestamp: u32) -> bool;
+    fn predates(&self, timestamp: NaiveDateTime) -> bool;
+}
+
+/// Check if a block was mined after a timestamp.  Both `block_time` and `after`
+/// are seconds since epoch.
+pub fn block_is_after(block_time: i64, after: i64) -> bool {
+    // Ensuring we do not miss a transaction is vital and it doesn't hurt to go back
+    // up the chain further than we need to.  So, add an arbitrary  margin.  TCP
+    // default timeout (15 minutes) seems nice.
+    const MARGIN: i64 = 15 * 60;
+
+    block_time > (after - MARGIN)
 }

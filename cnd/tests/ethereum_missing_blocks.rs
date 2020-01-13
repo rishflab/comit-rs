@@ -1,8 +1,9 @@
 pub mod ethereum_helper;
 
+use chrono::offset::Utc;
 use cnd::{
     btsieve::ethereum::{matching_transaction, TransactionPattern},
-    ethereum::{Block, Transaction, TransactionAndReceipt, TransactionReceipt},
+    ethereum::{Transaction, TransactionAndReceipt, TransactionReceipt},
 };
 use ethereum_helper::EthereumConnectorMock;
 
@@ -36,9 +37,6 @@ async fn find_transaction_in_missing_block() {
         ],
         vec![(transaction.hash, receipt.clone())],
     );
-    let block1: Block<Transaction> = include_json_test_data!(
-        "./test_data/ethereum/find_transaction_in_missing_block/block1.json"
-    );
 
     let pattern = TransactionPattern {
         from_address: None,
@@ -49,7 +47,7 @@ async fn find_transaction_in_missing_block() {
         events: None,
     };
     let expected_transaction_and_receipt =
-        matching_transaction(connector, pattern, Some(block1.timestamp.as_u32()))
+        matching_transaction(connector, pattern, Utc::now().naive_local())
             .await
             .unwrap();
 
@@ -95,9 +93,6 @@ async fn find_transaction_in_missing_block_with_big_gap() {
         ],
         vec![(transaction.hash, receipt.clone())],
     );
-    let block1: Block<Transaction> = include_json_test_data!(
-        "./test_data/ethereum/find_transaction_in_missing_block/block1.json"
-    );
 
     let pattern = TransactionPattern {
         from_address: None,
@@ -108,7 +103,7 @@ async fn find_transaction_in_missing_block_with_big_gap() {
         events: None,
     };
     let expected_transaction_and_receipt =
-        matching_transaction(connector, pattern, Some(block1.timestamp.as_u32()))
+        matching_transaction(connector, pattern, Utc::now().naive_local())
             .await
             .unwrap();
 

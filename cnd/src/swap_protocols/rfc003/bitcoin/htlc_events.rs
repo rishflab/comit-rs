@@ -13,6 +13,7 @@ use crate::{
 };
 use anyhow::Context;
 use bitcoin::{Amount, OutPoint};
+use chrono::NaiveDateTime;
 use futures_core::future::{self, Either};
 
 #[async_trait::async_trait]
@@ -20,6 +21,7 @@ impl HtlcEvents<Bitcoin, Amount> for BitcoindConnector {
     async fn htlc_deployed(
         &self,
         htlc_params: HtlcParams<Bitcoin, Amount>,
+        after: NaiveDateTime,
     ) -> anyhow::Result<Deployed<Bitcoin>> {
         let connector = self.clone();
         let pattern = TransactionPattern {
@@ -28,7 +30,7 @@ impl HtlcEvents<Bitcoin, Amount> for BitcoindConnector {
             unlock_script: None,
         };
 
-        let transaction = matching_transaction(connector, pattern, None)
+        let transaction = matching_transaction(connector, pattern, after)
             .await
             .context("failed to find transaction to deploy htlc")?;
 
@@ -49,6 +51,7 @@ impl HtlcEvents<Bitcoin, Amount> for BitcoindConnector {
         &self,
         _htlc_params: HtlcParams<Bitcoin, Amount>,
         htlc_deployment: &Deployed<Bitcoin>,
+        _after: NaiveDateTime,
     ) -> anyhow::Result<Funded<Bitcoin, Amount>> {
         let tx = &htlc_deployment.transaction;
         let asset = Amount::from_sat(tx.output[htlc_deployment.location.vout as usize].value);
@@ -64,6 +67,7 @@ impl HtlcEvents<Bitcoin, Amount> for BitcoindConnector {
         htlc_params: HtlcParams<Bitcoin, Amount>,
         htlc_deployment: &Deployed<Bitcoin>,
         _htlc_funding: &Funded<Bitcoin, Amount>,
+        after: NaiveDateTime,
     ) -> anyhow::Result<Either<Redeemed<Bitcoin>, Refunded<Bitcoin>>> {
         let redeemed = async {
             let connector = self.clone();
@@ -73,7 +77,7 @@ impl HtlcEvents<Bitcoin, Amount> for BitcoindConnector {
                 unlock_script: Some(vec![vec![1u8]]),
             };
 
-            let transaction = matching_transaction(connector, pattern, None)
+            let transaction = matching_transaction(connector, pattern, after)
                 .await
                 .context("failed to find transaction to redeem from htlc")?;
             let secret = extract_secret(&transaction, &htlc_params.secret_hash)
@@ -92,7 +96,7 @@ impl HtlcEvents<Bitcoin, Amount> for BitcoindConnector {
                 from_outpoint: Some(htlc_deployment.location),
                 unlock_script: Some(vec![vec![]]),
             };
-            let transaction = matching_transaction(connector, pattern, None)
+            let transaction = matching_transaction(connector, pattern, after)
                 .await
                 .context("failed to find transaction to refund from htlc")?;
 

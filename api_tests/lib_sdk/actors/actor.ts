@@ -15,7 +15,7 @@ import { Actors } from "./index";
 
 export class Actor {
     public static defaultActionConfig = {
-        maxTimeoutSecs: 5,
+        maxTimeoutSecs: 10,
         tryIntervalSecs: 1,
     };
 
@@ -326,6 +326,10 @@ export class Actor {
 
     public async assertBetaRefunded() {
         await this.assertLedgerState("beta_ledger", "REFUNDED");
+    }
+
+    public async start() {
+        await this.cndInstance.start();
     }
 
     public async restart() {

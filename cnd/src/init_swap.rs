@@ -1,11 +1,9 @@
 use crate::{
     asset::Asset,
+    db::AcceptedSwap,
     seed::DeriveSwapSeed,
     swap_protocols::{
-        rfc003::{
-            alice, bob, create_swap, events::HtlcEvents, state_store::StateStore, Accept, Ledger,
-            Request,
-        },
+        rfc003::{alice, bob, create_swap, events::HtlcEvents, state_store::StateStore, Ledger},
         Role,
     },
 };
@@ -13,13 +11,13 @@ use crate::{
 #[allow(clippy::cognitive_complexity)]
 pub fn init_accepted_swap<D, AL: Ledger, BL: Ledger, AA: Asset, BA: Asset>(
     dependencies: &D,
-    request: Request<AL, BL, AA, BA>,
-    accept: Accept<AL, BL>,
+    accepted: AcceptedSwap<AL, BL, AA, BA>,
     role: Role,
 ) -> anyhow::Result<()>
 where
     D: StateStore + Clone + DeriveSwapSeed + HtlcEvents<AL, AA> + HtlcEvents<BL, BA>,
 {
+    let (request, accept, at) = accepted;
     let id = request.swap_id;
     let seed = dependencies.derive_swap_seed(id);
     log::trace!("initialising accepted swap: {}", id);
@@ -33,6 +31,7 @@ where
                 dependencies.clone(),
                 request,
                 accept,
+                at,
             ));
         }
         Role::Bob => {
@@ -43,6 +42,7 @@ where
                 dependencies.clone(),
                 request,
                 accept,
+                at,
             ));
         }
     };
