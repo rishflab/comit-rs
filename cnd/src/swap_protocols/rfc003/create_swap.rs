@@ -60,6 +60,7 @@ pub async fn create_swap<D, A: ActorState>(
         match generator.async_resume().await {
             // every event that is yielded is passed on
             GeneratorState::Yielded(event) => {
+                log::info!("Yielded event {:?} for swap {}", event, id);
                 dependencies.update::<A>(&id, event);
             }
             // the generator stopped executing, this means there are no more events that can be
