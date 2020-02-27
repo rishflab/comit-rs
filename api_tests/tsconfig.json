@@ -1,15 +1,24 @@
 {
     "compilerOptions": {
-        "target": "es6",
-        "module": "commonjs",
         "allowSyntheticDefaultImports": true,
-        "noImplicitAny": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "inlineSources": true,
         "lib": ["es5", "es2015", "es2017", "es6", "dom"],
+        "module": "commonjs",
+        "moduleResolution": "node",
         "noEmit": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
+        "outDir": "dist",
         "resolveJsonModule": true,
-        "esModuleInterop": true,
-        "typeRoots": ["./node_modules/@types", "./types"]
-    }
+        "skipLibCheck": true,
+        "sourceMap": true,
+        "strict": false,
+        "target": "es6",
+        "declaration": true,
+        "typeRoots": ["./node_modules/@types", "./types"],
+        "types": ["node", "jest"]
+    },
+    "exclude": ["e2e", "dist", "lib", "dry", "tests"]
 }

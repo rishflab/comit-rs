@@ -91,7 +91,7 @@ export class LedgerRunner {
                 const ethereumConfig = await this.getEthereumNodeConfig();
                 const erc20Wallet = new EthereumWallet(ethereumConfig);
                 global.tokenContract = await erc20Wallet.deployErc20TokenContract(
-                    global.projectRoot
+                    this.projectRoot
                 );
                 if (global.verbose) {
                     console.log(
