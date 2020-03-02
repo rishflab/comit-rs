@@ -25,61 +25,67 @@ function toMatch(swapDetail: SwapDetails): MatchInterface {
 // Multiple peers                               //
 // ******************************************** //
 describe("Dry - multiple peers", () => {
-    it("alice-sends-swap-request-to-bob-and-charlie", async function() {
-        await threeActorTest(
-            "alice-sends-swap-request-to-bob-and-charlie",
-            async function({ alice, bob, charlie }) {
-                // Alice send swap request to Bob
-                const aliceToBobSwapUrl = await alice.cnd.postSwap(
-                    await createDefaultSwapRequest(bob)
-                );
+    it.concurrent(
+        "alice-sends-swap-request-to-bob-and-charlie",
+        async function() {
+            await threeActorTest(
+                "alice-sends-swap-request-to-bob-and-charlie",
+                async function({ alice, bob, charlie }) {
+                    // Alice send swap request to Bob
+                    const aliceToBobSwapUrl = await alice.cnd.postSwap(
+                        await createDefaultSwapRequest(bob)
+                    );
 
-                // Alice send swap request to Charlie
-                const aliceToCharlieSwapUrl = await alice.cnd.postSwap(
-                    await createDefaultSwapRequest(charlie)
-                );
+                    // Alice send swap request to Charlie
+                    const aliceToCharlieSwapUrl = await alice.cnd.postSwap(
+                        await createDefaultSwapRequest(charlie)
+                    );
 
-                // fetch swap details
-                const aliceToBobSwapDetails = await alice.pollSwapDetails(
-                    aliceToBobSwapUrl
-                );
+                    // fetch swap details
+                    const aliceToBobSwapDetails = await alice.pollSwapDetails(
+                        aliceToBobSwapUrl
+                    );
 
-                const aliceToCharlieSwapDetails = await alice.pollSwapDetails(
-                    aliceToCharlieSwapUrl
-                );
+                    const aliceToCharlieSwapDetails = await alice.pollSwapDetails(
+                        aliceToCharlieSwapUrl
+                    );
 
-                // Bob get swap details
-                const bobSwapDetails = await bob.pollSwapDetails(
-                    aliceToBobSwapUrl
-                );
+                    // Bob get swap details
+                    const bobSwapDetails = await bob.pollSwapDetails(
+                        aliceToBobSwapUrl
+                    );
 
-                // Charlie get swap details
-                const charlieSwapDetails = await charlie.pollSwapDetails(
-                    aliceToCharlieSwapUrl
-                );
+                    // Charlie get swap details
+                    const charlieSwapDetails = await charlie.pollSwapDetails(
+                        aliceToCharlieSwapUrl
+                    );
 
-                expect(
-                    bobSwapDetails.properties,
-                    "[Bob] should have same id as Alice"
-                ).to.have.property("id", aliceToBobSwapDetails.properties.id);
-                expect(
-                    charlieSwapDetails.properties,
-                    "[Charlie] should have same id as Alice"
-                ).to.have.property(
-                    "id",
-                    aliceToCharlieSwapDetails.properties.id
-                );
+                    expect(
+                        bobSwapDetails.properties,
+                        "[Bob] should have same id as Alice"
+                    ).to.have.property(
+                        "id",
+                        aliceToBobSwapDetails.properties.id
+                    );
+                    expect(
+                        charlieSwapDetails.properties,
+                        "[Charlie] should have same id as Alice"
+                    ).to.have.property(
+                        "id",
+                        aliceToCharlieSwapDetails.properties.id
+                    );
 
-                expect(
-                    [
-                        aliceToBobSwapDetails,
-                        aliceToCharlieSwapDetails,
-                    ].map(swapDetail => toMatch(swapDetail))
-                ).to.have.deep.members([
-                    toMatch(bobSwapDetails),
-                    toMatch(charlieSwapDetails),
-                ]);
-            }
-        );
-    });
+                    expect(
+                        [
+                            aliceToBobSwapDetails,
+                            aliceToCharlieSwapDetails,
+                        ].map(swapDetail => toMatch(swapDetail))
+                    ).to.have.deep.members([
+                        toMatch(bobSwapDetails),
+                        toMatch(charlieSwapDetails),
+                    ]);
+                }
+            );
+        }
+    );
 });

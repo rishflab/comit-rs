@@ -12,7 +12,7 @@ import * as sirenJsonSchema from "../../siren.schema.json";
 // ******************************************** //
 
 describe("Dry - peers using IP", () => {
-    it("invalid-swap-yields-404", async function() {
+    it.concurrent("invalid-swap-yields-404", async function() {
         await oneActorTest("invalid-swap-yields-404", async function({
             alice,
         }) {
@@ -28,7 +28,7 @@ describe("Dry - peers using IP", () => {
         });
     });
 
-    it("empty-swap-list-after-startup", async function() {
+    it.concurrent("empty-swap-list-after-startup", async function() {
         await oneActorTest("empty-swap-list-after-startup", async function({
             alice,
         }) {
@@ -40,7 +40,7 @@ describe("Dry - peers using IP", () => {
         });
     });
 
-    it("bad-request-for-invalid-swap-combination", async function() {
+    it.concurrent("bad-request-for-invalid-swap-combination", async function() {
         await oneActorTest(
             "bad-request-for-invalid-swap-combination",
             async function({ alice }) {
@@ -77,7 +77,7 @@ describe("Dry - peers using IP", () => {
             }
         );
     });
-    it("returns-invalid-body-for-bad-json", async function() {
+    it.concurrent("returns-invalid-body-for-bad-json", async function() {
         await oneActorTest("returns-invalid-body-for-bad-json", async function({
             alice,
         }) {
@@ -95,7 +95,7 @@ describe("Dry - peers using IP", () => {
             expect(res.body.title).to.equal("Invalid body.");
         });
     });
-    it("alice-has-empty-peer-list", async function() {
+    it.concurrent("alice-has-empty-peer-list", async function() {
         await oneActorTest("alice-has-empty-peer-list", async function({
             alice,
         }) {
@@ -105,20 +105,25 @@ describe("Dry - peers using IP", () => {
             expect(res.body.peers).to.have.length(0);
         });
     });
-    it("returns-listen-addresses-on-root-document", async function() {
-        await oneActorTest(
-            "returns-listen-addresses-on-root-document",
-            async function({ alice }) {
-                const res = await request(alice.cndHttpApiUrl()).get("/");
+    it.concurrent(
+        "returns-listen-addresses-on-root-document",
+        async function() {
+            await oneActorTest(
+                "returns-listen-addresses-on-root-document",
+                async function({ alice }) {
+                    const res = await request(alice.cndHttpApiUrl()).get("/");
 
-                expect(res.body.id).to.be.a("string");
-                expect(res.body.listen_addresses).to.be.an("array");
-                // At least 2 ipv4 addresses, lookup and external interface
-                expect(res.body.listen_addresses.length).to.be.greaterThan(1);
-            }
-        );
-    });
-    it("can-fetch-root-document-as-siren", async function() {
+                    expect(res.body.id).to.be.a("string");
+                    expect(res.body.listen_addresses).to.be.an("array");
+                    // At least 2 ipv4 addresses, lookup and external interface
+                    expect(res.body.listen_addresses.length).to.be.greaterThan(
+                        1
+                    );
+                }
+            );
+        }
+    );
+    it.concurrent("can-fetch-root-document-as-siren", async function() {
         await oneActorTest("can-fetch-root-document-as-siren", async function({
             alice,
         }) {
@@ -128,62 +133,70 @@ describe("Dry - peers using IP", () => {
             expect(res.body).to.be.jsonSchema(sirenJsonSchema);
         });
     });
-    it("returns-listen-addresses-on-root-document-as-siren", async function() {
-        await oneActorTest(
-            "returns-listen-addresses-on-root-document-as-siren",
-            async function({ alice }) {
-                const res = await request(alice.cndHttpApiUrl())
-                    .get("/")
-                    .set("accept", "application/vnd.siren+json");
+    it.concurrent(
+        "returns-listen-addresses-on-root-document-as-siren",
+        async function() {
+            await oneActorTest(
+                "returns-listen-addresses-on-root-document-as-siren",
+                async function({ alice }) {
+                    const res = await request(alice.cndHttpApiUrl())
+                        .get("/")
+                        .set("accept", "application/vnd.siren+json");
 
-                expect(res.body.properties.id).to.be.a("string");
-                expect(res.body.properties.listen_addresses).to.be.an("array");
-                // At least 2 ipv4 addresses, lookup and external interface
-                expect(
-                    res.body.properties.listen_addresses.length
-                ).to.be.greaterThan(1);
-            }
-        );
-    });
-    it("returns-links-to-create-swap-endpoints-on-root-document-as-siren", async function() {
-        await oneActorTest(
-            "returns-links-to-create-swap-endpoints-on-root-document-as-siren",
-            async function({ alice }) {
-                const res = await request(alice.cndHttpApiUrl())
-                    .get("/")
-                    .set("accept", "application/vnd.siren+json");
-                const links = res.body.links;
+                    expect(res.body.properties.id).to.be.a("string");
+                    expect(res.body.properties.listen_addresses).to.be.an(
+                        "array"
+                    );
+                    // At least 2 ipv4 addresses, lookup and external interface
+                    expect(
+                        res.body.properties.listen_addresses.length
+                    ).to.be.greaterThan(1);
+                }
+            );
+        }
+    );
+    it.concurrent(
+        "returns-links-to-create-swap-endpoints-on-root-document-as-siren",
+        async function() {
+            await oneActorTest(
+                "returns-links-to-create-swap-endpoints-on-root-document-as-siren",
+                async function({ alice }) {
+                    const res = await request(alice.cndHttpApiUrl())
+                        .get("/")
+                        .set("accept", "application/vnd.siren+json");
+                    const links = res.body.links;
 
-                const swapsLink = links.find(
-                    (link: Link) =>
-                        link.rel.length === 1 &&
-                        link.rel.includes("collection") &&
-                        link.class.length === 1 &&
-                        link.class.includes("swaps")
-                );
+                    const swapsLink = links.find(
+                        (link: Link) =>
+                            link.rel.length === 1 &&
+                            link.rel.includes("collection") &&
+                            link.class.length === 1 &&
+                            link.class.includes("swaps")
+                    );
 
-                expect(swapsLink).to.be.deep.equal({
-                    rel: ["collection"],
-                    class: ["swaps"],
-                    href: "/swaps",
-                });
+                    expect(swapsLink).to.be.deep.equal({
+                        rel: ["collection"],
+                        class: ["swaps"],
+                        href: "/swaps",
+                    });
 
-                const rfc003SwapsLink = links.find(
-                    (link: Link) =>
-                        link.rel.length === 2 &&
-                        link.rel.includes("collection") &&
-                        link.rel.includes("edit") &&
-                        link.class.length === 2 &&
-                        link.class.includes("swaps") &&
-                        link.class.includes("rfc003")
-                );
+                    const rfc003SwapsLink = links.find(
+                        (link: Link) =>
+                            link.rel.length === 2 &&
+                            link.rel.includes("collection") &&
+                            link.rel.includes("edit") &&
+                            link.class.length === 2 &&
+                            link.class.includes("swaps") &&
+                            link.class.includes("rfc003")
+                    );
 
-                expect(rfc003SwapsLink).to.be.deep.equal({
-                    rel: ["collection", "edit"],
-                    class: ["swaps", "rfc003"],
-                    href: "/swaps/rfc003",
-                });
-            }
-        );
-    });
+                    expect(rfc003SwapsLink).to.be.deep.equal({
+                        rel: ["collection", "edit"],
+                        class: ["swaps", "rfc003"],
+                        href: "/swaps/rfc003",
+                    });
+                }
+            );
+        }
+    );
 });

@@ -36,7 +36,7 @@ async function assertValidSirenDocument(
 }
 
 describe("Dry - rfc003 schema", () => {
-    it("get-all-swaps-is-valid-siren", async function() {
+    it.concurrent("get-all-swaps-is-valid-siren", async function() {
         await twoActorTest("get-all-swaps-is-valid-siren", async function({
             alice,
         }) {
@@ -45,7 +45,7 @@ describe("Dry - rfc003 schema", () => {
             expect(res.body).to.be.jsonSchema(sirenJsonSchema);
         });
     });
-    it("get-single-swap-is-valid-siren", async function() {
+    it.concurrent("get-single-swap-is-valid-siren", async function() {
         await twoActorTest("get-single-swap-is-valid-siren", async function({
             alice,
             bob,
@@ -78,7 +78,7 @@ describe("Dry - rfc003 schema", () => {
         });
     });
 
-    it("get-single-swap-contains-link-to-rfc", async function() {
+    it.concurrent("get-single-swap-contains-link-to-rfc", async function() {
         await twoActorTest(
             "get-single-swap-contains-link-to-rfc",
             async function({ alice, bob }) {
@@ -123,7 +123,7 @@ async function assertSwapsInProgress(actor: Actor, message: string) {
 }
 
 describe("Dry - rfc003 swap reject", () => {
-    it("alice-can-make-default-swap-request", async function() {
+    it.concurrent("alice-can-make-default-swap-request", async function() {
         await twoActorTest(
             "alice-can-make-default-swap-request",
             async function({ alice, bob }) {
@@ -155,7 +155,7 @@ describe("Dry - rfc003 swap reject", () => {
         );
     });
 
-    it("bob-can-decline-swap", async function() {
+    it.concurrent("bob-can-decline-swap", async function() {
         await twoActorTest("bob-can-decline-swap", async function({
             alice,
             bob,

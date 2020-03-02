@@ -30,7 +30,7 @@ async function assertPeersAvailable(alice: Actor, bob: Actor, message: string) {
 }
 
 describe("Dry - peers using IP", () => {
-    it("alice-empty-peer-list", async function() {
+    it.concurrent("alice-empty-peer-list", async function() {
         await twoActorTest("alice-empty-peer-list", async function({ alice }) {
             const res = await request(alice.cndHttpApiUrl()).get("/peers");
 
@@ -39,7 +39,7 @@ describe("Dry - peers using IP", () => {
         });
     });
 
-    it("alice-send-request-wrong-peer-id", async function() {
+    it.concurrent("alice-send-request-wrong-peer-id", async function() {
         await threeActorTest(
             "alice-send-request-wrong-peer-id",
             async function({ alice, bob, charlie }) {
@@ -81,7 +81,7 @@ describe("Dry - peers using IP", () => {
         );
     });
 
-    it("alice-send-swap-request-to-charlie", async function() {
+    it.concurrent("alice-send-swap-request-to-charlie", async function() {
         await threeActorTest(
             "alice-send-swap-request-to-charlie",
             async function({ alice, bob, charlie }) {
