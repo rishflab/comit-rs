@@ -21,13 +21,11 @@ export async function createActor(
             },
         }).getLogger(whoAmI);
 
-    const actor = await Actor.newInstance(
+    return Actor.newInstance(
         loggerFactory,
         name,
         global.ledgerConfigs,
         global.projectRoot,
         global.logRoot
     );
-
-    return actor;
 }

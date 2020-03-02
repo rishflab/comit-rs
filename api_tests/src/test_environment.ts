@@ -34,12 +34,6 @@ export class E2ETestEnvironment extends NodeEnvironment {
             encoding: "utf8",
         }).trim();
         this.testRoot = this.projectRoot + "/api_tests";
-        this.logDir = this.projectRoot + "/api_tests/log";
-
-        rimraf.sync(this.logDir);
-        fs.mkdirSync(this.logDir);
-
-        this.ledgerRunner = new LedgerRunner(this.projectRoot, this.logDir);
     }
 
     async setup() {
@@ -49,7 +43,6 @@ export class E2ETestEnvironment extends NodeEnvironment {
         // setup global variables
         this.global.projectRoot = this.projectRoot;
         this.global.testRoot = this.testRoot;
-        this.global.logRoot = this.logDir;
         this.global.ledgerConfigs = {};
         this.global.verbose = false;
         if (commander.verbose) {
@@ -59,16 +52,34 @@ export class E2ETestEnvironment extends NodeEnvironment {
         // Will trigger if docblock contains @ledgers
         // @ts-ignore
         const configString = this.docblockPragmas.ledgers;
+
         if (configString) {
             const config: ConfigInterface = JSON.parse(configString);
 
             // setup ledgers
             if (config.ledgers) {
+                this.logDir =
+                    this.projectRoot +
+                    "/api_tests/log/" +
+                    config.ledgers.toString().replace(",", "_");
+                E2ETestEnvironment.cleanLogDir(this.logDir);
+
+                this.ledgerRunner = new LedgerRunner(
+                    this.projectRoot,
+                    this.logDir
+                );
+
                 console.log(`Initializing ledgers : ${config.ledgers}`);
                 await this.ledgerRunner.ensureLedgersRunning(config.ledgers);
                 this.global.ledgerConfigs = await this.ledgerRunner.getLedgerConfig();
             }
         }
+        this.global.logRoot = this.logDir;
+    }
+
+    private static cleanLogDir(logDir: string) {
+        rimraf.sync(logDir);
+        fs.mkdirSync(logDir);
     }
 
     async teardown() {
