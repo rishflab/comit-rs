@@ -1,5 +1,5 @@
 /**
- * @ledgers { "ledgers": ["bitcoin", "ethereum"] }
+ * @config { "ledgers": ["bitcoin", "ethereum"], "logDir" : "bitcoin_ethereum" }
  */
 
 import { twoActorTest } from "../../lib/actor_test_new";

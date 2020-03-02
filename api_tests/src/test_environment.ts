@@ -14,6 +14,7 @@ import * as fs from "fs";
 
 interface ConfigInterface {
     ledgers: string[];
+    logDir: string;
 }
 
 export class E2ETestEnvironment extends NodeEnvironment {
@@ -45,25 +46,24 @@ export class E2ETestEnvironment extends NodeEnvironment {
         this.global.testRoot = this.testRoot;
         this.global.ledgerConfigs = {};
         this.global.verbose = false;
+        this.logDir = "unspecified";
         if (commander.verbose) {
             this.global.verbose = true;
         }
 
         // Will trigger if docblock contains @ledgers
         // @ts-ignore
-        const configString = this.docblockPragmas.ledgers;
+        const configString = this.docblockPragmas.config;
 
         if (configString) {
             const config: ConfigInterface = JSON.parse(configString);
+            const logDir = config.logDir ? config.logDir : "unspecified";
+            this.logDir = this.projectRoot + "/api_tests/log/" + logDir;
+
+            E2ETestEnvironment.cleanLogDir(this.logDir);
 
             // setup ledgers
             if (config.ledgers) {
-                this.logDir =
-                    this.projectRoot +
-                    "/api_tests/log/" +
-                    config.ledgers.toString().replace(",", "_");
-                E2ETestEnvironment.cleanLogDir(this.logDir);
-
                 this.ledgerRunner = new LedgerRunner(
                     this.projectRoot,
                     this.logDir
@@ -95,7 +95,9 @@ export class E2ETestEnvironment extends NodeEnvironment {
 
     async cleanupAll() {
         try {
-            await this.ledgerRunner.stopLedgers();
+            if (this.ledgerRunner) {
+                await this.ledgerRunner.stopLedgers();
+            }
         } catch (e) {
             console.error("Failed to clean up resources", e);
         }
