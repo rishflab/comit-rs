@@ -6,6 +6,7 @@ import { promisify } from "util";
 import { Global } from "@jest/types";
 import { LedgerConfig } from "./ledgers/ledger_runner";
 import rimraf from "rimraf";
+import { Mutex } from "async-mutex";
 
 export interface HarnessGlobal extends Global.Global {
     ledgerConfigs: LedgerConfig;
@@ -14,6 +15,7 @@ export interface HarnessGlobal extends Global.Global {
     logRoot: string;
     verbose: boolean;
     tokenContract: string;
+    parityAccountMutex: Mutex;
 }
 
 export const unlinkAsync = promisify(fs.unlink);

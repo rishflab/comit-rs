@@ -7,6 +7,7 @@ import { HarnessGlobal } from "../lib/utils";
 import NodeEnvironment from "jest-environment-node";
 import rimraf from "rimraf";
 import * as fs from "fs";
+import { Mutex } from "async-mutex";
 
 // ************************ //
 // Setting global variables //
@@ -47,6 +48,9 @@ export class E2ETestEnvironment extends NodeEnvironment {
         this.global.ledgerConfigs = {};
         this.global.verbose = false;
         this.logDir = "unspecified";
+
+        this.global.parityAccountMutex = new Mutex();
+
         if (commander.verbose) {
             this.global.verbose = true;
         }

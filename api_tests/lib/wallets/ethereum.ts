@@ -42,58 +42,68 @@ export class EthereumWallet implements Wallet {
     }
 
     private async mintErc20(asset: Asset): Promise<void> {
-        let toAddress = this.inner.getAccount();
+        const release = await global.parityAccountMutex.acquire();
+        try {
+            let toAddress = this.inner.getAccount();
 
-        const functionIdentifier = "40c10f19";
-        toAddress = toAddress.replace(/^0x/, "").padStart(64, "0");
+            const functionIdentifier = "40c10f19";
+            toAddress = toAddress.replace(/^0x/, "").padStart(64, "0");
 
-        const bigNumber = ethers.utils.bigNumberify(asset.quantity);
-        const hexAmount = bigNumber
-            .toHexString()
-            .replace(/^0x/, "")
-            .padStart(64, "0");
-        const data = "0x" + functionIdentifier + toAddress + hexAmount;
+            const bigNumber = ethers.utils.bigNumberify(asset.quantity);
+            const hexAmount = bigNumber
+                .toHexString()
+                .replace(/^0x/, "")
+                .padStart(64, "0");
+            const data = "0x" + functionIdentifier + toAddress + hexAmount;
 
-        const tx: TransactionRequest = {
-            to: asset.token_contract,
-            gasLimit: "0x100000",
-            value: "0x0",
-            data,
-        };
-        const transactionResponse = await this.parity.sendTransaction(tx);
-        const transactionReceipt = await transactionResponse.wait(1);
+            const tx: TransactionRequest = {
+                to: asset.token_contract,
+                gasLimit: "0x100000",
+                value: "0x0",
+                data,
+            };
+            const transactionResponse = await this.parity.sendTransaction(tx);
+            const transactionReceipt = await transactionResponse.wait(1);
 
-        if (!transactionReceipt.status) {
-            throw new Error(
-                `Minting ${asset.quantity} tokens to address ${toAddress} failed`
-            );
-        }
+            if (!transactionReceipt.status) {
+                throw new Error(
+                    `Minting ${asset.quantity} tokens to address ${toAddress} failed`
+                );
+            }
 
-        if (global.verbose) {
-            console.log(
-                `Minted ${asset.quantity} erc20 tokens (${asset.token_contract}) for ${toAddress}`
-            );
+            if (global.verbose) {
+                console.log(
+                    `Minted ${asset.quantity} erc20 tokens (${asset.token_contract}) for ${toAddress}`
+                );
+            }
+        } finally {
+            release();
         }
     }
 
     private async mintEther(asset: Asset): Promise<void> {
-        const startingBalance = await this.getBalanceByAsset(asset);
+        const release = await global.parityAccountMutex.acquire();
+        try {
+            const startingBalance = await this.getBalanceByAsset(asset);
 
-        const minimumExpectedBalance = asset.quantity;
+            const minimumExpectedBalance = asset.quantity;
 
-        // make sure we have at least twice as much
-        const value = new BigNumberEthers(minimumExpectedBalance).mul(2);
-        await this.parity.sendTransaction({
-            to: this.account(),
-            value,
-            gasLimit: 21000,
-        });
+            // make sure we have at least twice as much
+            const value = new BigNumberEthers(minimumExpectedBalance).mul(2);
+            await this.parity.sendTransaction({
+                to: this.account(),
+                value,
+                gasLimit: 21000,
+            });
 
-        await pollUntilMinted(
-            this,
-            startingBalance.minus(new BigNumber(minimumExpectedBalance)),
-            asset
-        );
+            await pollUntilMinted(
+                this,
+                startingBalance.minus(new BigNumber(minimumExpectedBalance)),
+                asset
+            );
+        } finally {
+            release();
+        }
     }
 
     public account(): string {
