@@ -12,8 +12,6 @@ import * as fs from "fs";
 // Setting global variables //
 // ************************ //
 
-declare var global: HarnessGlobal;
-
 interface ConfigInterface {
     ledgers: string[];
 }
@@ -24,6 +22,9 @@ export class E2ETestEnvironment extends NodeEnvironment {
     private testRoot: string;
     private logDir: string;
     private ledgerRunner: LedgerRunner;
+    // @ts-ignore
+    public global: HarnessGlobal;
+
     constructor(config: Config.ProjectConfig, context: any) {
         super(config);
 
@@ -50,7 +51,7 @@ export class E2ETestEnvironment extends NodeEnvironment {
         this.global.testRoot = this.testRoot;
         this.global.logRoot = this.logDir;
         this.global.ledgerConfigs = {};
-        this.global.verbose = true; // TODO change default to false
+        this.global.verbose = false;
         if (commander.verbose) {
             this.global.verbose = true;
         }

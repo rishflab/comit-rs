@@ -3,10 +3,10 @@ import { Actor } from "./actors/actor";
 import { SwapRequest } from "comit-sdk";
 import * as fs from "fs";
 import { promisify } from "util";
-import Global = NodeJS.Global;
+import { Global } from "@jest/types";
 import { LedgerConfig } from "./ledgers/ledger_runner";
 
-export interface HarnessGlobal extends Global {
+export interface HarnessGlobal extends Global.Global {
     ledgerConfigs: LedgerConfig;
     testRoot: string;
     projectRoot: string;

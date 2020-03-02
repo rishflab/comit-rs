@@ -65,19 +65,13 @@ export class CndInstance {
             );
         }
 
-        // this.process.on("exit", (code: number, signal: number) => {
-        //     // if (global.verbose) {
-        //     //     console.log(
-        //     //         `cnd ${this.actorConfig.name} exited with ${code ||
-        //     //             `signal ${signal}`}`
-        //     //     );
-        //     // } TODO: can't print after test terminated and this is executed after test and fails apparently
-        // });
-
         await sleep(1000); // allow the nodes to start up
     }
 
     public stop() {
+        if (global.verbose) {
+            console.log(`terminating cnd ${this.actorConfig.name}`);
+        }
         this.process.kill("SIGINT");
         this.process = null;
     }

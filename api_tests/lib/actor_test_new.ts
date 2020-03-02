@@ -37,17 +37,6 @@ async function nActorTest(
 }
 
 /*
- * Instantiates a new e2e test based on three actors
- *
- */
-export function threeActorTest(
-    name: string,
-    testFn: (actors: Actors) => Promise<void>
-) {
-    nActorTest(name, ["alice", "bob", "charlie"], testFn);
-}
-
-/*
  * Instantiates a new e2e test based on two actors
  */
 export async function twoActorTest(
@@ -55,14 +44,4 @@ export async function twoActorTest(
     testFn: (actors: Actors) => Promise<void>
 ) {
     await nActorTest(name, ["alice", "bob"], testFn);
-}
-
-/*
- * Instantiates a new e2e test based on one actor
- */
-export function oneActorTest(
-    name: string,
-    testFn: (actors: Actors) => Promise<void>
-) {
-    nActorTest(name, ["alice"], testFn);
 }
