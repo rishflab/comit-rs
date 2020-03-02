@@ -119,7 +119,11 @@ pub async fn handle_action(
 
                 let swap_request = state.request();
                 let seed = dependencies.derive_swap_seed(swap_id);
-                let state = State::declined(swap_request.clone(), decline_message, seed);
+                let state = State::<AL, BL, AA, BA, AI, BI, AH, BH>::declined(
+                    swap_request.clone(),
+                    decline_message,
+                    seed,
+                );
                 StateStore::insert(&dependencies, swap_id, state);
 
                 Ok(ActionResponseBody::None)

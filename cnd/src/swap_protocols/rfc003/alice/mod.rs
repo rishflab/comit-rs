@@ -12,20 +12,20 @@ use derivative::Derivative;
 
 #[derive(Clone, Derivative)]
 #[derivative(Debug, PartialEq)]
-pub struct State<AL, BL, AA, BA, AI, BI>
+pub struct State<AL, BL, AA, BA, AI, BI, AH, BH>
 where
     AL: Ledger,
     BL: Ledger,
 {
     pub swap_communication: SwapCommunication<AL, BL, AA, BA, AI, BI>,
-    pub alpha_ledger_state: LedgerState<AL::HtlcLocation, AL::Transaction, AA>,
-    pub beta_ledger_state: LedgerState<BL::HtlcLocation, BL::Transaction, BA>,
+    pub alpha_ledger_state: LedgerState<AH, AL::Transaction, AA>,
+    pub beta_ledger_state: LedgerState<BH, BL::Transaction, BA>,
     #[derivative(Debug = "ignore", PartialEq = "ignore")]
     pub secret_source: SwapSeed, // Used to derive identities and also to generate the secret.
     pub failed: bool,
 }
 
-impl<AL, BL, AA, BA, AI, BI> State<AL, BL, AA, BA, AI, BI>
+impl<AL, BL, AA, BA, AI, BI, AH, BH> State<AL, BL, AA, BA, AI, BI, AH, BH>
 where
     AL: Ledger,
     BL: Ledger,
@@ -76,7 +76,7 @@ where
     }
 }
 
-impl<AL, BL, AA, BA, AI, BI> ActorState for State<AL, BL, AA, BA, AI, BI>
+impl<AL, BL, AA, BA, AI, BI, AH, BH> ActorState for State<AL, BL, AA, BA, AI, BI, AH, BH>
 where
     AL: Ledger,
     BL: Ledger,
@@ -98,11 +98,11 @@ where
         &self.swap_communication.request().beta_asset
     }
 
-    fn alpha_ledger_mut(&mut self) -> &mut LedgerState<AL::HtlcLocation, AL::Transaction, AA> {
+    fn alpha_ledger_mut(&mut self) -> &mut LedgerState<AH, AL::Transaction, AA> {
         &mut self.alpha_ledger_state
     }
 
-    fn beta_ledger_mut(&mut self) -> &mut LedgerState<BL::HtlcLocation, BL::Transaction, BA> {
+    fn beta_ledger_mut(&mut self) -> &mut LedgerState<BH, BL::Transaction, BA> {
         &mut self.beta_ledger_state
     }
 

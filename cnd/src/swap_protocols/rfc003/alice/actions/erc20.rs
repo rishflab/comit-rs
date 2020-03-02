@@ -14,7 +14,8 @@ use crate::{
 };
 use std::convert::Infallible;
 
-impl<BL, BA, BI> Actions for alice::State<Ethereum, BL, asset::Erc20, BA, identity::Ethereum, BI>
+impl<BL, BA, BI, BH> Actions
+    for alice::State<Ethereum, BL, asset::Erc20, BA, identity::Ethereum, BI, identity::Ethereum, BH>
 where
     BL: Ledger,
     BA: Clone,
@@ -73,7 +74,8 @@ where
     }
 }
 
-impl<AL, AA, AI> Actions for alice::State<AL, Ethereum, AA, asset::Erc20, AI, identity::Ethereum>
+impl<AL, AA, AI, AH> Actions
+    for alice::State<AL, Ethereum, AA, asset::Erc20, AI, identity::Ethereum, AH, identity::Ethereum>
 where
     AL: Ledger,
     AA: Clone,
@@ -81,7 +83,7 @@ where
     (AL, AA): FundAction<HtlcParams = HtlcParams<AL, AA, AI>>
         + RefundAction<
             HtlcParams = HtlcParams<AL, AA, AI>,
-            HtlcLocation = AL::HtlcLocation,
+            HtlcLocation = AH,
             FundTransaction = AL::Transaction,
         >,
 {
