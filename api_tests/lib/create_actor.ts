@@ -13,7 +13,10 @@ export async function createActor(
             appenders: {
                 file: {
                     type: "file",
-                    filename: "log/tests/" + logFileName.replace(/\//g, "_"),
+                    filename:
+                        global.logRoot +
+                        "/tests/" +
+                        logFileName.replace(/\//g, "_"),
                 },
             },
             categories: {
