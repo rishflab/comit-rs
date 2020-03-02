@@ -5,7 +5,7 @@ import { HarnessGlobal } from "./utils";
 declare var global: HarnessGlobal;
 
 export async function createActor(
-    logFileName: string,
+    testFolderName: string,
     name: string
 ): Promise<Actor> {
     const loggerFactory = (whoAmI: string) =>
@@ -13,10 +13,7 @@ export async function createActor(
             appenders: {
                 file: {
                     type: "file",
-                    filename:
-                        global.logRoot +
-                        "/tests/" +
-                        logFileName.replace(/\//g, "_"),
+                    filename: `${testFolderName}/test.log`,
                 },
             },
             categories: {
@@ -29,6 +26,6 @@ export async function createActor(
         name,
         global.ledgerConfigs,
         global.projectRoot,
-        global.logRoot
+        testFolderName
     );
 }

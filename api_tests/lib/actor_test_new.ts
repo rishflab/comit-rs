@@ -20,7 +20,7 @@ async function nActorTest(
         );
     }
 
-    const actors = await createActors(`${name}.log`, actorNames);
+    const actors = await createActors(`${name}`, actorNames);
 
     try {
         await timeout(60000, testFn(actors));
