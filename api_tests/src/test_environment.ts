@@ -1,7 +1,6 @@
 import { Script } from "vm";
 import { Config } from "@jest/types";
 import { execSync } from "child_process";
-import commander from "commander";
 import { LedgerRunner } from "../lib/ledgers/ledger_runner";
 import { HarnessGlobal } from "../lib/utils";
 import NodeEnvironment from "jest-environment-node";
@@ -44,13 +43,11 @@ export class E2ETestEnvironment extends NodeEnvironment {
         this.global.projectRoot = this.projectRoot;
         this.global.testRoot = this.testRoot;
         this.global.ledgerConfigs = {};
-        this.global.verbose = false;
+        this.global.verbose =
+            this.global.process.argv.find(item => item.includes("verbose")) !==
+            undefined;
         this.logDir = "unspecified";
         this.global.parityAccountMutex = new Mutex();
-
-        if (commander.verbose) {
-            this.global.verbose = true;
-        }
 
         if (this.global.verbose) {
             console.log(`Starting up test environment`);
