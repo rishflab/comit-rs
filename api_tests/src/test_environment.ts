@@ -87,7 +87,7 @@ export class E2ETestEnvironment extends NodeEnvironment {
 
     private static cleanLogDir(logDir: string) {
         rimraf.sync(logDir);
-        fs.mkdirSync(logDir);
+        fs.mkdirSync(logDir, { recursive: true });
     }
 
     async teardown() {
