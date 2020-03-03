@@ -9,7 +9,7 @@ import "chai/register-should";
 import "../../lib/setup_chai";
 import * as sirenJsonSchema from "../../siren.schema.json";
 import * as swapPropertiesJsonSchema from "../../swap.schema.json";
-import { twoActorTest } from "../../lib/actor_test_new";
+import { twoActorTest } from "../../lib/actor_test";
 import { createDefaultSwapRequest, DEFAULT_ALPHA } from "../../lib/utils";
 import { Action } from "comit-sdk";
 

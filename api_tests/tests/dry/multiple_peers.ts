@@ -2,7 +2,7 @@
  * @config { "logDir": "dry" }
  */
 
-import { threeActorTest } from "../../lib/actor_test_new";
+import { threeActorTest } from "../../lib/actor_test";
 import { createDefaultSwapRequest } from "../../lib/utils";
 import { expect } from "chai";
 import { SwapDetails } from "comit-sdk/dist/src/cnd/cnd";

@@ -1,6 +1,7 @@
 import { configure } from "log4js";
 import { Actor } from "./actors/actor";
 import { HarnessGlobal } from "./utils";
+import path from "path";
 
 declare var global: HarnessGlobal;
 
@@ -13,7 +14,7 @@ export async function createActor(
             appenders: {
                 file: {
                     type: "file",
-                    filename: `${testFolderName}/test.log`,
+                    filename: path.join(testFolderName, "test.log"),
                 },
             },
             categories: {

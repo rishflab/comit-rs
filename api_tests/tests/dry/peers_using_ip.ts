@@ -2,7 +2,7 @@
  * @config { "logDir": "peers_ip" }
  */
 
-import { threeActorTest, twoActorTest } from "../../lib/actor_test_new";
+import { threeActorTest, twoActorTest } from "../../lib/actor_test";
 import { createDefaultSwapRequest, sleep } from "../../lib/utils";
 import { expect, request } from "chai";
 import { Actor } from "../../lib/actors/actor";

@@ -2,7 +2,7 @@
  * @config { "ledgers": ["bitcoin", "ethereum"], "logDir" : "bitcoin_ethereum" }
  */
 
-import { twoActorTest } from "../../lib/actor_test_new";
+import { twoActorTest } from "../../lib/actor_test";
 import { AssetKind } from "../../lib/asset";
 import { sleep } from "../../lib/utils";
 import { expect } from "chai";

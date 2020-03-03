@@ -2,7 +2,7 @@
  * @config { "logDir": "sanity" }
  */
 
-import { oneActorTest } from "../../lib/actor_test_new";
+import { oneActorTest } from "../../lib/actor_test";
 import { expect, request } from "chai";
 import { Entity, Link } from "../../gen/siren";
 import * as sirenJsonSchema from "../../siren.schema.json";

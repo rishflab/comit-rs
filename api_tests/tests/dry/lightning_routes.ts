@@ -3,7 +3,7 @@
  */
 
 import { expect } from "chai";
-import { oneActorTest } from "../../lib/actor_test_new";
+import { oneActorTest } from "../../lib/actor_test";
 
 // ******************************************** //
 // Lightning routes                               //
