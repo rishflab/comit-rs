@@ -40,19 +40,20 @@ export class E2ETestEnvironment extends NodeEnvironment {
 
     async setup() {
         await super.setup();
-        console.log(`Starting up test environment`);
-
         // setup global variables
         this.global.projectRoot = this.projectRoot;
         this.global.testRoot = this.testRoot;
         this.global.ledgerConfigs = {};
         this.global.verbose = false;
         this.logDir = "unspecified";
-
         this.global.parityAccountMutex = new Mutex();
 
         if (commander.verbose) {
             this.global.verbose = true;
+        }
+
+        if (this.global.verbose) {
+            console.log(`Starting up test environment`);
         }
 
         // Will trigger if docblock contains @ledgers
@@ -74,7 +75,9 @@ export class E2ETestEnvironment extends NodeEnvironment {
                     this.global
                 );
 
-                console.log(`Initializing ledgers : ${config.ledgers}`);
+                if (this.global.verbose) {
+                    console.log(`Initializing ledgers : ${config.ledgers}`);
+                }
                 await this.ledgerRunner.ensureLedgersRunning(config.ledgers);
                 this.global.ledgerConfigs = await this.ledgerRunner.getLedgerConfig();
             }
@@ -89,9 +92,13 @@ export class E2ETestEnvironment extends NodeEnvironment {
 
     async teardown() {
         await super.teardown();
-        console.log(`Tearing down test environment.`);
+        if (this.global.verbose) {
+            console.log(`Tearing down test environment.`);
+        }
         await this.cleanupAll();
-        console.log(`All teared down.`);
+        if (this.global.verbose) {
+            console.log(`All teared down.`);
+        }
     }
 
     async runScript(script: Script) {
