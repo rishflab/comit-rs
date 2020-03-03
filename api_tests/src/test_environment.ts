@@ -70,7 +70,8 @@ export class E2ETestEnvironment extends NodeEnvironment {
             if (config.ledgers) {
                 this.ledgerRunner = new LedgerRunner(
                     this.projectRoot,
-                    this.logDir
+                    this.logDir,
+                    this.global
                 );
 
                 console.log(`Initializing ledgers : ${config.ledgers}`);

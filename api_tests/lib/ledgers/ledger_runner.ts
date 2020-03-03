@@ -7,8 +7,6 @@ import { EthereumWallet } from "../wallets/ethereum";
 import { HarnessGlobal } from "../utils";
 import { EthereumNodeConfig } from "./ethereum";
 
-declare var global: HarnessGlobal;
-
 export interface LedgerConfig {
     bitcoin?: BitcoinNodeConfig;
     ethereum?: EthereumNodeConfig;
@@ -25,7 +23,8 @@ export class LedgerRunner {
 
     constructor(
         private readonly projectRoot: string,
-        private readonly logDir: string
+        private readonly logDir: string,
+        private global: HarnessGlobal
     ) {
         this.runningLedgers = {};
         this.blockTimers = {};
@@ -75,7 +74,7 @@ export class LedgerRunner {
             this.runningLedgers[ledger] = instance;
 
             if (ledger === "bitcoin") {
-                if (global.verbose) {
+                if (this.global.verbose) {
                     console.log(
                         "Bitcoin: initialization after ledger is running."
                     );
@@ -90,13 +89,13 @@ export class LedgerRunner {
             if (ledger === "ethereum") {
                 const ethereumConfig = await this.getEthereumNodeConfig();
                 const erc20Wallet = new EthereumWallet(ethereumConfig);
-                global.tokenContract = await erc20Wallet.deployErc20TokenContract(
+                this.global.tokenContract = await erc20Wallet.deployErc20TokenContract(
                     this.projectRoot
                 );
-                if (global.verbose) {
+                if (this.global.verbose) {
                     console.log(
                         "Ethereum: deployed Erc20 contract at %s",
-                        global.tokenContract
+                        this.global.tokenContract
                     );
                 }
             }
