@@ -37,19 +37,14 @@ async function assertValidSirenDocument(
 
 describe("Dry - rfc003 schema", () => {
     it("get-all-swaps-is-valid-siren", async function() {
-        await twoActorTest("get-all-swaps-is-valid-siren", async function({
-            alice,
-        }) {
+        await twoActorTest(async function({ alice }) {
             const res = await request(alice.cndHttpApiUrl()).get("/swaps");
 
             expect(res.body).to.be.jsonSchema(sirenJsonSchema);
         });
     });
     it("get-single-swap-is-valid-siren", async function() {
-        await twoActorTest("get-single-swap-is-valid-siren", async function({
-            alice,
-            bob,
-        }) {
+        await twoActorTest(async function({ alice, bob }) {
             // Alice send swap request to Bob
             await alice.cnd.postSwap(await createDefaultSwapRequest(bob));
 
@@ -79,32 +74,28 @@ describe("Dry - rfc003 schema", () => {
     });
 
     it("get-single-swap-contains-link-to-rfc", async function() {
-        await twoActorTest(
-            "get-single-swap-contains-link-to-rfc",
-            async function({ alice, bob }) {
-                // Alice send swap request to Bob
-                await alice.cnd.postSwap(await createDefaultSwapRequest(bob));
+        await twoActorTest(async function({ alice, bob }) {
+            // Alice send swap request to Bob
+            await alice.cnd.postSwap(await createDefaultSwapRequest(bob));
 
-                const aliceSwapEntity = await alice
-                    .pollCndUntil("/swaps", body => body.entities.length > 0)
-                    .then(
-                        body =>
-                            body.entities[0] as EmbeddedRepresentationSubEntity
-                    );
-
-                const protocolLink = aliceSwapEntity.links.find((link: Link) =>
-                    link.rel.includes("describedBy")
+            const aliceSwapEntity = await alice
+                .pollCndUntil("/swaps", body => body.entities.length > 0)
+                .then(
+                    body => body.entities[0] as EmbeddedRepresentationSubEntity
                 );
 
-                expect(protocolLink).to.be.deep.equal({
-                    rel: ["describedBy"],
-                    class: ["protocol-spec"],
-                    type: "text/html",
-                    href:
-                        "https://github.com/comit-network/RFCs/blob/master/RFC-003-SWAP-Basic.adoc",
-                });
-            }
-        );
+            const protocolLink = aliceSwapEntity.links.find((link: Link) =>
+                link.rel.includes("describedBy")
+            );
+
+            expect(protocolLink).to.be.deep.equal({
+                rel: ["describedBy"],
+                class: ["protocol-spec"],
+                type: "text/html",
+                href:
+                    "https://github.com/comit-network/RFCs/blob/master/RFC-003-SWAP-Basic.adoc",
+            });
+        });
     });
 });
 
@@ -124,42 +115,36 @@ async function assertSwapsInProgress(actor: Actor, message: string) {
 
 describe("Dry - rfc003 swap reject", () => {
     it("alice-can-make-default-swap-request", async function() {
-        await twoActorTest(
-            "alice-can-make-default-swap-request",
-            async function({ alice, bob }) {
-                // Alice should be able to send two swap requests to Bob
-                await alice.cnd.postSwap({
-                    ...(await createDefaultSwapRequest(bob)),
-                    alpha_asset: {
-                        name: DEFAULT_ALPHA.asset.name,
-                        quantity: DEFAULT_ALPHA.asset.quantity.reasonable,
-                    },
-                });
-                await alice.cnd.postSwap({
-                    ...(await createDefaultSwapRequest(bob)),
-                    alpha_asset: {
-                        name: DEFAULT_ALPHA.asset.name,
-                        quantity: DEFAULT_ALPHA.asset.quantity.stingy,
-                    },
-                });
+        await twoActorTest(async function({ alice, bob }) {
+            // Alice should be able to send two swap requests to Bob
+            await alice.cnd.postSwap({
+                ...(await createDefaultSwapRequest(bob)),
+                alpha_asset: {
+                    name: DEFAULT_ALPHA.asset.name,
+                    quantity: DEFAULT_ALPHA.asset.quantity.reasonable,
+                },
+            });
+            await alice.cnd.postSwap({
+                ...(await createDefaultSwapRequest(bob)),
+                alpha_asset: {
+                    name: DEFAULT_ALPHA.asset.name,
+                    quantity: DEFAULT_ALPHA.asset.quantity.stingy,
+                },
+            });
 
-                await assertSwapsInProgress(
-                    alice,
-                    "[Alice] Shows the swaps as IN_PROGRESS in GET /swaps"
-                );
-                await assertSwapsInProgress(
-                    bob,
-                    "[Bob] Shows the swaps as IN_PROGRESS in /swaps"
-                );
-            }
-        );
+            await assertSwapsInProgress(
+                alice,
+                "[Alice] Shows the swaps as IN_PROGRESS in GET /swaps"
+            );
+            await assertSwapsInProgress(
+                bob,
+                "[Bob] Shows the swaps as IN_PROGRESS in /swaps"
+            );
+        });
     });
 
     it("bob-can-decline-swap", async function() {
-        await twoActorTest("bob-can-decline-swap", async function({
-            alice,
-            bob,
-        }) {
+        await twoActorTest(async function({ alice, bob }) {
             // Alice should be able to send two swap requests to Bob
             const aliceReasonableSwap = await alice.cnd.postSwap({
                 ...(await createDefaultSwapRequest(bob)),

@@ -1,6 +1,7 @@
 import { Actors } from "./actors";
 import { createActors } from "./create_actors";
 import { HarnessGlobal, timeout } from "./utils";
+import JasmineSmacker from "smack-my-jasmine-up";
 
 declare var global: HarnessGlobal;
 
@@ -9,10 +10,10 @@ declare var global: HarnessGlobal;
  * after the test, regardless if the test succeeded or failed.
  */
 async function nActorTest(
-    name: string,
     actorNames: ["alice", "bob", "charlie"] | ["alice", "bob"] | ["alice"],
     testFn: (actors: Actors) => Promise<void>
 ) {
+    const name = JasmineSmacker.getCurrentTestName();
     if (!name.match(/[A-z0-9\-]+/)) {
         // We use the test name as a file name for the log and hence need to restrict it.
         throw new Error(
@@ -39,21 +40,15 @@ async function nActorTest(
 /*
  * Instantiates a new e2e test based on one actor
  */
-export async function oneActorTest(
-    name: string,
-    testFn: (actors: Actors) => Promise<void>
-) {
-    await nActorTest(name, ["alice"], testFn);
+export async function oneActorTest(testFn: (actors: Actors) => Promise<void>) {
+    await nActorTest(["alice"], testFn);
 }
 
 /*
  * Instantiates a new e2e test based on two actors
  */
-export async function twoActorTest(
-    name: string,
-    testFn: (actors: Actors) => Promise<void>
-) {
-    await nActorTest(name, ["alice", "bob"], testFn);
+export async function twoActorTest(testFn: (actors: Actors) => Promise<void>) {
+    await nActorTest(["alice", "bob"], testFn);
 }
 
 /*
@@ -61,8 +56,7 @@ export async function twoActorTest(
  *
  */
 export async function threeActorTest(
-    name: string,
     testFn: (actors: Actors) => Promise<void>
 ) {
-    await nActorTest(name, ["alice", "bob", "charlie"], testFn);
+    await nActorTest(["alice", "bob", "charlie"], testFn);
 }

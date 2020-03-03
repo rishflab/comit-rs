@@ -79,6 +79,7 @@
         "readline-promise": "^1.0.4",
         "rimraf": "^3.0.2",
         "satoshi-bitcoin": "^1.0.4",
+        "smack-my-jasmine-up": "^0.0.3",
         "tail": "^2.0.3",
         "temp-write": "^4.0.0",
         "testcontainers": "^2.6.0",
