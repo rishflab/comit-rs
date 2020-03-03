@@ -6,6 +6,27 @@ import { twoActorTest } from "../../lib/actor_test_new";
 import { AssetKind } from "../../lib/asset";
 import { sleep } from "../../lib/utils";
 import { expect } from "chai";
+import { LedgerKind } from "../../lib/ledgers/ledger";
+
+// ******************************************** //
+// Lightning Sanity Test                        //
+// ******************************************** //
+describe("Sanity - LND Alice pays Bob", () => {
+    it("sanity-lnd-alice-pays-bob", async function() {
+        await twoActorTest("sanity-lnd-alice-pays-bob", async function({
+            alice,
+            bob,
+        }) {
+            await alice.sendRequest(
+                { ledger: LedgerKind.Lightning, asset: AssetKind.Bitcoin },
+                { ledger: LedgerKind.Bitcoin, asset: AssetKind.Bitcoin }
+            );
+            const { id, request } = await bob.createLnInvoice(200);
+            await alice.payLnInvoice(request);
+            await bob.assertLnInvoiceSettled(id);
+        });
+    });
+});
 
 // ******************************************** //
 // Bitcoin/bitcoin Alpha Ledger/ Alpha Asset    //
